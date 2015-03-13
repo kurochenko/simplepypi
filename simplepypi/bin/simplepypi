@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import os.path
+import sys, os.path
 
 from twisted.internet import reactor
 import twisted.python.log
@@ -104,7 +104,7 @@ class Controller(object):
         else:
             return return404(request)
 
-def set_up_server(port):
+def set_up_server(port, package_path):
     observer = twisted.python.log.PythonLoggingObserver()
     observer.start()
 
@@ -126,7 +126,6 @@ def set_up_server(port):
     dispatcher.connect('package_and_version', '/pypi/{package}/{version}',
             controller=controller, action='package_and_version')
 
-    package_path = os.path.join(os.path.dirname(__file__), 'packages')
     dispatcher.putChild('packages', File(package_path))
 
     factory = Site(dispatcher)
@@ -136,4 +135,12 @@ def set_up_server(port):
     reactor.run()
 
 if __name__ == '__main__':
-    set_up_server(8000)
+
+    port = 8000
+    package_path = os.path.join(os.path.dirname(__file__), 'packages')
+
+    if len(sys.argv) == 3:
+        port = int(sys.argv[1])
+        package_path = sys.argv[2]
+
+    set_up_server(port, package_path)
