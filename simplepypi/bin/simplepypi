@@ -14,19 +14,24 @@ def return404(request):
     request.setResponseCode(404)
     return '<html><head><title>404 Not Found</title></head><body><h1>Not found</h1></body></html>'
 
-def get_package_path(package, version=None, want_file=False):
-    path = os.path.join(os.path.dirname(__file__), 'packages', package)
-
-    if version:
-        path = os.path.join(path, version)
-
-        if want_file:
-            path = os.path.join(path, '%s-%s.tar.gz' % (package, version))
-
-    return path
-
 
 class Controller(object):
+
+    def __init__(self, package_path):
+        self.package_path = package_path
+
+
+    def get_package_path(package, version=None, want_file=False):
+        path = os.path.join(self.package_path, 'packages', package)
+
+        if version:
+            path = os.path.join(path, version)
+
+            if want_file:
+                path = os.path.join(path, '%s-%s.tar.gz' % (package, version))
+
+        return path
+
 
     def get_index(self, request):
         return '<html><head><title>simplepypi</title></head><body><a href="/packages">packages</a></body></html>'
@@ -42,7 +47,7 @@ class Controller(object):
 
             name = name.lower()
 
-            path = get_package_path(name, version, want_file=True)
+            path = self.get_package_path(name, version, want_file=True)
 
             if not os.path.exists(os.path.dirname(path)):
                 os.makedirs(os.path.dirname(path))
@@ -74,7 +79,7 @@ class Controller(object):
     def package(self, request, package):
         package = package.lower()
 
-        package_path = get_package_path(package)
+        package_path = self.get_package_path(package)
 
         if not os.path.exists(package_path):
             return return404(request)
@@ -95,7 +100,7 @@ class Controller(object):
     def package_and_version(self, request, package, version):
         package = package.lower()
 
-        path = get_package_path(package, version, want_file=True)
+        path = self.get_package_path(package, version, want_file=True)
 
         if os.path.exists(path):
             body = '<html><body><a href="/packages/%(package)s/%(version)s/%(package)s-%(version)s.tar.gz">%(package)s-%(version)s.tar.gz</a></body></html>' % {'package': package, 'version': version}
@@ -109,7 +114,7 @@ def set_up_server(port, package_path):
     observer.start()
 
     dispatcher = txroutes.Dispatcher()
-    controller = Controller()
+    controller = Controller(package_path)
 
     dispatcher.connect('get_index', '/', controller=controller,
             action='get_index', conditions=dict(method=['GET']))
