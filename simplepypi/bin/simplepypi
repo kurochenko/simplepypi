@@ -61,7 +61,7 @@ class Controller(object):
     def get_pypi(self, request):
         body = '<html><body>\n'
 
-        packages_path = os.path.join(os.path.dirname(__file__), 'packages')
+        packages_path = os.path.join(self.package_path, 'packages')
         packages_list = os.listdir(packages_path)
 
         for each in packages_list:
