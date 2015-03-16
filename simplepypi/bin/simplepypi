@@ -22,7 +22,7 @@ class Controller(object):
 
 
     def get_package_path(self, package, version=None, want_file=False):
-        path = os.path.join(self.package_path, 'packages', package)
+        path = os.path.join(self.package_path, package)
 
         if version:
             path = os.path.join(path, version)
