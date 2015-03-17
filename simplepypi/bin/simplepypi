@@ -60,12 +60,10 @@ class Controller(object):
 
     def get_pypi(self, request):
         body = '<html><body>\n'
-
-        packages_path = os.path.join(self.package_path, 'packages')
-        packages_list = os.listdir(packages_path)
+        packages_list = os.listdir(self.package_path)
 
         for each in packages_list:
-            versions_path = os.path.join(packages_path, each)
+            versions_path = os.path.join(self.package_path, each)
             versions_list = os.listdir(versions_path)
             versions_list.sort()
 
